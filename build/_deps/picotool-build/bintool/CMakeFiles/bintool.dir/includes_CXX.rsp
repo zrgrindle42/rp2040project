@@ -1,0 +1,1 @@
+-I"C:/Users/zach/Desktop/rp2040project/build/_deps/picotool-src/bintool" -I"C:/Users/zach/Desktop/rp2040project/build/_deps/picotool-src/elf" -I"C:/Users/zach/Desktop/rp2040project/build/_deps/picotool-src/errors" -isystem "C:/Users/zach/Desktop/pico-sdk/src/common/boot_picobin_headers/include"

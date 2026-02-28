@@ -1,0 +1,2 @@
+C:\msys64\mingw64\bin\ar.exe qc libbintool.a CMakeFiles/bintool.dir/bintool.cpp.obj
+C:\msys64\mingw64\bin\ranlib.exe libbintool.a

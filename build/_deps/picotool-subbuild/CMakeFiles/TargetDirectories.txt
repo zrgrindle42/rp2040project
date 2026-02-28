@@ -1,0 +1,3 @@
+C:/Users/zach/Desktop/rp2040project/build/_deps/picotool-subbuild/CMakeFiles/picotool-populate.dir
+C:/Users/zach/Desktop/rp2040project/build/_deps/picotool-subbuild/CMakeFiles/edit_cache.dir
+C:/Users/zach/Desktop/rp2040project/build/_deps/picotool-subbuild/CMakeFiles/rebuild_cache.dir
