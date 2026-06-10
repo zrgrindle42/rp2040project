@@ -1,7 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"C:/Users/zach/Desktop/rp2040project/build/_deps/picotool-build/enc_bootloader/cmake_install.cmake"
-	],
-	"Parallel" : false
-}

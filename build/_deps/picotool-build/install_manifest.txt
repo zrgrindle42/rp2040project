@@ -1,6 +1,0 @@
-C:/Users/zach/Desktop/rp2040project/build/_deps/picotool/picotool.exe
-C:/Users/zach/Desktop/rp2040project/build/_deps/picotool/picotoolTargets.cmake
-C:/Users/zach/Desktop/rp2040project/build/_deps/picotool/picotoolTargets-release.cmake
-C:/Users/zach/Desktop/rp2040project/build/_deps/picotool/picotoolConfig.cmake
-C:/Users/zach/Desktop/rp2040project/build/_deps/picotool/picotoolConfigVersion.cmake
-C:/Users/zach/Desktop/rp2040project/build/_deps/picotool/enc_bootloader.elf
