@@ -76,4 +76,5 @@ CMakeFiles/rp2040project.dir/src/i2c.c.o: \
  /Users/elizabethgodsey/pico-sdk/src/rp2_common/pico_stdio_usb/include/pico/stdio_usb.h \
  /Users/elizabethgodsey/pico-sdk/src/rp2_common/hardware_i2c/include/hardware/i2c.h \
  /Users/elizabethgodsey/pico-sdk/src/rp2040/hardware_structs/include/hardware/structs/i2c.h \
- /Users/elizabethgodsey/pico-sdk/src/rp2040/hardware_regs/include/hardware/regs/i2c.h
+ /Users/elizabethgodsey/pico-sdk/src/rp2040/hardware_regs/include/hardware/regs/i2c.h \
+ /Users/elizabethgodsey/pico-sdk/src/common/pico_base_headers/include/pico/error.h

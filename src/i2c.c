@@ -1,4 +1,5 @@
 #include "sensor.h"
+#include "pico/error.h"
 
 //use mutex for the potential different i2c buses being used between i2c0/i2c1
 //add dma interrupts whenever grapyics begin to be added
@@ -18,8 +19,6 @@ uint8_t lpf[2] = {0x06, 0x11};
 uint8_t start_buffer[2] = {0x08, 0x03};
 
 //write to ctrl8 register if you ant to do any motion sensor stuff
-IMU imu;
-IMUParsed parsedimu;
 
 void configure_i2c_peripheral()
 {
@@ -29,11 +28,11 @@ gpio_set_function(I2C_SCL_PIN, GPIO_FUNC_I2C);
 gpio_pull_up(I2C_SDA_PIN); //now we have to have conditions for tis to be pulled down ????
 gpio_pull_up(I2C_SCL_PIN);
 //now we configure the imu registers here to prepare the byte reads of 
-i2c_write_register(PERIPHERAL_ADDRESS, config_buffer, 2,false );
-i2c_write_register(PERIPHERAL_ADDRESS, accel_settings, 2, false);
-i2c_write_register(PERIPHERAL_ADDRESS, gyro_settings, 2, false);
-i2c_write_register(PERIPHERAL_ADDRESS, lpf, 2, false);
-i2c_write_register(PERIPHERAL_ADDRESS, start_buffer, 2, false);
+i2c_write_blocking(i2c1, PERIPHERAL_ADDRESS, config_buffer, 2,false );
+i2c_write_blocking(i2c1, PERIPHERAL_ADDRESS, accel_settings, 2, false);
+i2c_write_blocking(i2c1, PERIPHERAL_ADDRESS, gyro_settings, 2, false);
+i2c_write_blocking(i2c1, PERIPHERAL_ADDRESS, lpf, 2, false);
+i2c_write_blocking(i2c1, PERIPHERAL_ADDRESS, start_buffer, 2, false);
 sleep_ms(500);
 
 //configure master, already done in i2c init//
@@ -41,52 +40,44 @@ sleep_ms(500);
 //enable inteerupts dma, etc. //DO LATER
 }
 
-
-
-//look at the imu.rp2040 registers you may need to set for this operation
-void i2c_write_register( uint8_t periph_address, const uint8_t *packet, size_t buffer_size, bool stop)
-{
-    //send register start bit low, do not need to do this wrapped in with the read write methods//
-    
-    i2c_write_blocking(i2c1, periph_address, packet, buffer_size, stop);//addr is the ddevice to write to, its address, and message is the data to send
-}
-
-
-
-void i2c_read_register(uint8_t *buffer, uint8_t address)
-{
-    i2c_read_blocking(i2c1, address, buffer, 16, false);
-}
-
-void IMU_data_exfil()
+bool IMU_data_exfil(IMUParsed *parsed_data) // last commit modified a global var, pass this pointer in
 {
     
     //once tasks build up, use mutex to keep guard of bus resource during read/write
-     i2c_write_register(PERIPHERAL_ADDRESS, imupacket, 1, false); // reatin control of bus when a read immedaitely follows for more accurate data
-     i2c_read_register(rx_buffer, PERIPHERAL_ADDRESS);
+     
+    int write = i2c_write_blocking(i2c1, PERIPHERAL_ADDRESS, imupacket, 1, false); 
+    if(write == PICO_ERROR_GENERIC) return false;
+    int read = i2c_read_blocking(i2c1, PERIPHERAL_ADDRESS, rx_buffer, sizeof(rx_buffer), false);
+    if(read == PICO_ERROR_GENERIC) return false;
 
     //printf("raw axl%02X axh%02X | ayh%02X| ayl%02X| azl%02X  | azh%02X| %02X| %02X | %02X | %02X | %02X | %02X\n",
          //  rx_buffer[0], rx_buffer[1], rx_buffer[2], rx_buffer[3], rx_buffer[4], rx_buffer[5], rx_buffer[6],
          // rx_buffer[7], rx_buffer[8], rx_buffer[9], rx_buffer[10], rx_buffer[11]);
-    imu.ax = (int16_t)rx_buffer[1] << 8  | rx_buffer[0];
-    imu.ay = (int16_t)rx_buffer[3] << 8  | rx_buffer[2];
-    imu.az = (int16_t)rx_buffer[5] << 8  | rx_buffer[4];
-    imu.gx = (int16_t)rx_buffer[7] << 8  | rx_buffer[6];
-    imu.gy = (int16_t)rx_buffer[9] << 8  | rx_buffer[8];
-    imu.gz = (int16_t)rx_buffer[11] << 8  | rx_buffer[10];
+    int16_t ax = (int16_t)rx_buffer[1] << 8  | rx_buffer[0];
+    int16_t ay = (int16_t)rx_buffer[3] << 8  | rx_buffer[2];
+    int16_t az = (int16_t)rx_buffer[5] << 8  | rx_buffer[4];
+    int16_t gx = (int16_t)rx_buffer[7] << 8  | rx_buffer[6];
+    int16_t gy = (int16_t)rx_buffer[9] << 8  | rx_buffer[8];
+    int16_t gz = (int16_t)rx_buffer[11] << 8  | rx_buffer[10];
     //printf("raw16 ax=%d ay=%d az=%d gx=%d gy=%d gz=%d\n",
        // imu.ax, imu.ay, imu.az, imu.gx, imu.gy, imu.gz);
 
-    parsedimu.ax_parsed = (float)imu.ax / 4096.0f;
-    parsedimu.ay_parsed = (float)imu.ay / 4096.0f;
-    parsedimu.az_parsed = (float)imu.az / 4096.0f;
-    parsedimu.gx_parsed = (float)imu.gx / 65.536f;
-    parsedimu.gy_parsed = (float)imu.gy / 65.536f;
-    parsedimu.gz_parsed = (float)imu.gz / 65.536f;
+    parsed_data->ax_parsed = (float)ax / ACCEL_SCALE;
+    parsed_data->ay_parsed = (float)ay / ACCEL_SCALE;
+    parsed_data->az_parsed = (float)az / ACCEL_SCALE;
+    parsed_data->gx_parsed = (float)gx / GYRO_SCALE; 
+    parsed_data->gy_parsed = (float)gy / GYRO_SCALE;
+    parsed_data->gz_parsed = (float)gz / GYRO_SCALE;
+
+    return true;
 
 }
 
-
+//new methods:
+//parse the barometer humidity and temperature data, and add to the queue for the logging task to print out.
+// what we will need; two wueues for exclusicvity, mutex for the separate buses, and then we can add a task for the barometer data exfiltration and logging.
+//as well as one for temperature data exfiltration and logging.
+//may need interrupt for the barometer data exfiltration task to ensure we are getting accurate data, and not just the most recent data when the task is scheduled to run.
 
 
 

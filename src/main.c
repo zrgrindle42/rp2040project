@@ -10,35 +10,38 @@ static QueueHandle_t xImuQueue;
 //look into interrupts for this task when more stuff gets added in
 void ImuTask(void* pv)
 {
-
-    //gpio_init(25);
-    //gpio_set_dir(25, GPIO_OUT);
    TickType_t xLastWakeTime = xTaskGetTickCount();
+   IMUParsed localimutask;
 
     while(1){
-      IMU_data_exfil();
       
-      //debug to see what we are sending
-        //printf("RP2040 alivefromimutask \n");
-      xQueueSend(xImuQueue, (void*) &parsedimu, sizeof(parsedimu));
+      
+      if(IMU_data_exfil(&localimutask))
+      {
+        xQueueSend(xImuQueue, (void*) &localimutask, 0);
+      }
+      else
+      {
+        printf("IMU read error\n");
+      }
+      
       vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(500));
-      //uxTaskGetStackHighWaterMark(NULL); //debug this to see if we are getting close to stack overflow
     }
 }
 
 void ImuLoggingTask(void* pv)
 {
-    IMUParsed imureceived; //debug this line to see what goes through the queue
-      TickType_t xLastWakeTime = xTaskGetTickCount();
+    IMUParsed imureceived;
+
     while (1) {
-        //printf("RP2040 alive \n");
-        
+        //blocks until queue is ready
         if (xQueueReceive(xImuQueue, &imureceived, portMAX_DELAY) == pdTRUE) {
             printf("ax %f | ay %f | az %f\n", (float)imureceived.ax_parsed, (float)imureceived.ay_parsed, (float)imureceived.az_parsed);
+            printf("--------------------------------\n");
             printf("gx %f | gy %f | gz %f\n", (float)imureceived.gx_parsed, (float)imureceived.gy_parsed, (float)imureceived.gz_parsed);
             
         }
-        // vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(500));
+
     }
 }
 
