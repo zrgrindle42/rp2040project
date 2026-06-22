@@ -23,12 +23,14 @@ include(${FREERTOS_KERNEL_PATH}/portable/ThirdParty/GCC/RP2040/FreeRTOS_Kernel_i
 add_subdirectory(freertos)
 
 add_executable(rp2040project src/main.c
-			      src/i2c.c)
+			      src/i2c.c
+				src/bmp/src/bmp280.c)
 
 target_include_directories(rp2040project PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/freertos/include
     ${CMAKE_CURRENT_SOURCE_DIR}/freertos/portable/ThirdParty/GCC/RP2040/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/bmp
 )
 
 target_link_libraries(rp2040project

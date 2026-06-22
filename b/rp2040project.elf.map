@@ -4354,9 +4354,9 @@ LOAD /Applications/ArmGNUToolchain/14.2.rel1/arm-none-eabi/bin/../lib/gcc/arm-no
                 0x200026d4      0x1e0 CMakeFiles/rp2040project.dir/freertos/tasks.c.o
  .bss.retrieved_id
                 0x200028b4        0x8 CMakeFiles/rp2040project.dir/Users/elizabethgodsey/pico-sdk/src/rp2_common/pico_unique_id/unique_id.c.o
- .bss.rx_buffer
+ .bss.imu_buffer
                 0x200028bc       0x10 CMakeFiles/rp2040project.dir/src/i2c.c.o
-                0x200028bc                rx_buffer
+                0x200028bc                imu_buffer
  .bss.sf_clz_func
                 0x200028cc        0x4 CMakeFiles/rp2040project.dir/Users/elizabethgodsey/pico-sdk/src/rp2_common/pico_double/double_init_rom_rp2040.c.o
                 0x200028cc                sf_clz_func

@@ -1,3 +1,9 @@
 mkdir build
 cd build
 cmake -G "MinGW Makefiles" -DPICO_TOOLCHAIN_PATH="C:/Program Files/Arm/GNU Toolchain mingw-w64-x86_64-arm-none-eabi/bin" -DPICO_SDK_PATH="C:/Users/zach/Desktop/pico-sdk" ..
+
+
+reading the i2c sensor steps
+
+see what address the imu sensor is on
+look up how to intitalize read/write to the display
