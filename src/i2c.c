@@ -16,7 +16,7 @@ uint8_t config_buffer[2] = {0x02, 0x40};
 uint8_t accel_settings[2] = {0x03, 0x22};
 uint8_t gyro_settings[2] = {0x04, 0x54};
 uint8_t lpf[2] = {0x06, 0x11};
-uint8_t start_buffer[2] = {0x08, 0x03};
+uint8_t start_buffer[2] = {0x08, 0x83};
 
 //write to ctrl8 register if you ant to do any motion sensor stuff
 
@@ -44,8 +44,26 @@ bool IMU_data_exfil(IMUParsed *parsed_data) // last commit modified a global var
 {
     
     //once tasks build up, use mutex to keep guard of bus resource during read/write
-     
-    int write = i2c_write_blocking(i2c1, PERIPHERAL_ADDRESS, imupacket, 1, false); 
+     uint8_t statusint_reg[1] = {0x2D};
+    uint8_t statusint;
+
+    int w1 = i2c_write_blocking(i2c1, PERIPHERAL_ADDRESS, statusint_reg, 1, true);
+    if (w1 != 1) return false;
+    int r1 = i2c_read_blocking(i2c1, PERIPHERAL_ADDRESS, &statusint, 1, false);
+    if (r1 != 1) return false;
+
+    if (!(statusint & 0x01)) {
+        return false;  // data not available yet, skip this cycle
+    }
+
+    uint8_t status0_reg[1] = {0x2E};
+    uint8_t status0;
+    int w2 = i2c_write_blocking(i2c1, PERIPHERAL_ADDRESS, status0_reg, 1, true);
+    if (w2 != 1) return false;
+    int r2 = i2c_read_blocking(i2c1, PERIPHERAL_ADDRESS, &status0, 1, false);
+    if (r2 != 1) return false;
+    // this read just locked the data — now burst-read immediately
+    int write = i2c_write_blocking(i2c1, PERIPHERAL_ADDRESS, imupacket, 1, true); 
     if(write == PICO_ERROR_GENERIC) return false;
     int read = i2c_read_blocking(i2c1, PERIPHERAL_ADDRESS, rx_buffer, sizeof(rx_buffer), false);
     if(read == PICO_ERROR_GENERIC) return false;
@@ -73,6 +91,23 @@ bool IMU_data_exfil(IMUParsed *parsed_data) // last commit modified a global var
 
 }
 
+//FIND PLACE FOR THIS LATER // handled by config files in lib import
+void configure_spi()
+{
+    spi_init(spi1, 40000 * 1000);
+    gpio_set_function(LCD_CLK_PIN, GPIO_FUNC_SPI);
+    gpio_set_function(LCD_MOSI_PIN, GPIO_FUNC_SPI);
+
+    gpio_init(LCD_DC_PIN); gpio_set_dir(LCD_DC_PIN, GPIO_OUT);
+    gpio_init(LCD_CS_PIN); gpio_set_dir(LCD_CS_PIN, GPIO_OUT );
+    gpio_init(LCD_CLK_PIN); gpio_set_dir(LCD_CLK_PIN, GPIO_OUT);
+    gpio_init(LCD_RST_PIN); gpio_set_dir(LCD_RST_PIN, GPIO_OUT );
+   // gpio_put(LCD_CS_PIN, 1); // keep it not selected for now
+
+
+   
+}
+//gpio init gpio set function 0 =gpio_in 1 = gpioout
 //new methods:
 //parse the barometer humidity and temperature data, and add to the queue for the logging task to print out.
 // what we will need; two wueues for exclusicvity, mutex for the separate buses, and then we can add a task for the barometer data exfiltration and logging.

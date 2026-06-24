@@ -24,13 +24,26 @@ add_subdirectory(freertos)
 
 add_executable(rp2040project src/main.c
 			      src/i2c.c
-				src/bmp/src/bmp280.c)
+			      src/lib/RP2040-LCD-1.28/c/lib/LCD/LCD_1in28.c
+			      src/lib/RP2040-LCD-1.28/c/lib/GUI/GUI_PAINT.c
+				
+			      src/lib/RP2040-LCD-1.28/c/lib/Config/DEV_Config.c
+
+			      src/lib/RP2040-LCD-1.28/c/lib/Fonts/font8.c
+			      src/lib/RP2040-LCD-1.28/c/lib/Fonts/font12.c
+			      src/lib/RP2040-LCD-1.28/c/lib/Fonts/font16.c
+			      src/lib/RP2040-LCD-1.28/c/lib/Fonts/font20.c
+			      src/lib/RP2040-LCD-1.28/c/lib/Fonts/font24.c)
+
 
 target_include_directories(rp2040project PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/freertos/include
     ${CMAKE_CURRENT_SOURCE_DIR}/freertos/portable/ThirdParty/GCC/RP2040/include
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/bmp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/RP2040-LCD-1.28/c/lib/LCD
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/RP2040-LCD-1.28/c/lib/GUI
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/RP2040-LCD-1.28/c/lib/Fonts
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/lib/RP2040-LCD-1.28/c/lib/Config
 )
 
 target_link_libraries(rp2040project
@@ -41,6 +54,9 @@ target_link_libraries(rp2040project
     FreeRTOS-Kernel-Heap4
     pico_malloc
     hardware_i2c
+    hardware_spi
+    hardware_adc
+    hardware_pwm
 )
 
 pico_enable_stdio_usb(rp2040project 1)
