@@ -3,7 +3,37 @@ cd build
 cmake -G "MinGW Makefiles" -DPICO_TOOLCHAIN_PATH="C:/Program Files/Arm/GNU Toolchain mingw-w64-x86_64-arm-none-eabi/bin" -DPICO_SDK_PATH="C:/Users/zach/Desktop/pico-sdk" ..
 
 
-reading the i2c sensor steps
+spitballing for the adc 
+have an interrupt that fires whenever the first buffer is done
 
-see what address the imu sensor is on
-look up how to intitalize read/write to the display
+have it notify a task. this task takes buffer a's duta points and calculates the mean data point of these values
+after that ship that data value and have it displayed
+
+
+1. initialize the adc
+
+2. get the dma configured
+
+3. write logic for the dma
+
+4 get the interrupt written for the dma
+
+5. task logic to parse teh two buffers
+
+6. display task handling
+
+
+
+
+1.) in main: adc_init()
+              adc_gpio_init(26);
+              adc_select_inout(0)
+
+    
+    sdc_run(true) // to start the internal clock 
+
+    every time clock ticks adc samples voltage adn takes it to the hardeare queue
+    dma controler wakes, grabs sample writes it to buffer thean sleeps
+    start dma first tho before the adcread
+
+    adc_irq_set_enabled

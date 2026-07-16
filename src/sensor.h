@@ -3,6 +3,14 @@
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
 #include "hardware/spi.h"
+#include "hardware/adc.h"
+#include "hardware/irq.h"
+#include "hardware/dma.h"
+
+#include "FreeRTOS.h"
+#include "task.h"
+#include "queue.h"
+
 #include "LCD_1in28.h"
 #include "GUI_Paint.h"
 #include "DEV_Config.h"
@@ -23,6 +31,18 @@
 // #define LCD_RST_PIN 12
 // #define LCD_BL_PIN 25
 
+extern volatile uint8_t which_buffer;
+
+extern TaskHandle_t adc_task_handle;
+
+typedef struct
+{
+    uint16_t dma_buffer_a[1024];
+    uint16_t dma_buffer_b[1024];
+}DMA;
+
+extern DMA dma;
+
 typedef struct
 {
     float ax_parsed;
@@ -33,9 +53,17 @@ typedef struct
     float gz_parsed;
 }IMUParsed;
 
+typedef struct{
+    float meanReceived; //for voltage
+}voltageData;
+
 void configure_i2c_peripheral();
 bool IMU_data_exfil(IMUParsed *parsed_data);
 void ImuTask(void* pv);
 void ImuDisplayandLoggingTask(void* pv);
+
+void init_adc();
+void AdcParseTask(void* pv);
+void BufferTriggerADC();
 
 void configure_spi();

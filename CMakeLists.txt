@@ -24,6 +24,7 @@ add_subdirectory(freertos)
 
 add_executable(rp2040project src/main.c
 			      src/i2c.c
+			      src/adc.c
 			      src/lib/RP2040-LCD-1.28/c/lib/LCD/LCD_1in28.c
 			      src/lib/RP2040-LCD-1.28/c/lib/GUI/GUI_PAINT.c
 				
@@ -56,6 +57,8 @@ target_link_libraries(rp2040project
     hardware_i2c
     hardware_spi
     hardware_adc
+    hardware_dma
+    hardware_irq
     hardware_pwm
 )
 

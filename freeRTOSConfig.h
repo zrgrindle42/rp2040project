@@ -42,7 +42,7 @@
 #define configSUPPORT_STATIC_ALLOCATION         0
 #define configSUPPORT_DYNAMIC_ALLOCATION        1           // Get FreeRTOS to allocation task memory
 #define configAPPLICATION_ALLOCATED_HEAP        0
-#define configTOTAL_HEAP_SIZE                   (128*1024)
+#define configTOTAL_HEAP_SIZE                   (32*1024)
 
 /* Hook function related definitions. */
 #define configUSE_IDLE_HOOK                     0
