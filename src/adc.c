@@ -24,7 +24,7 @@ void init_adc()
     adc_select_input(0);
 
     adc_fifo_setup(true, true, 1, false, false);
-    adc_set_clkdiv(96000.0f); // the rate at which the buffer fills, before at 960 and was starving imu task of cycles due to the interrupt
+    adc_set_clkdiv(4800.0f); // the rate at which the buffer fills, before at 960 and was starving imu task of cycles due to the interrupt
 
     dma_chan_a = dma_claim_unused_channel(true);
     dma_chan_b = dma_claim_unused_channel(true);

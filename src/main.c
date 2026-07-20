@@ -41,7 +41,7 @@ void ImuTask(void* pv)
         printf("IMU read error\n");
       }
       
-      vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(500));
+      vTaskDelayUntil(&xLastWakeTime, pdMS_TO_TICKS(50));
     }
 }
 
@@ -81,7 +81,7 @@ void ImuDisplayandLoggingTask(void* pv)
               //printf("STEP 7\n");
 
         //blocks until queue is ready
-        if (xQueueReceive(xImuQueue, &imureceived, portMAX_DELAY) == pdTRUE) {
+        if (xQueueReceive(xImuQueue, &imureceived, 0 ) == pdTRUE) {
             
            
            
@@ -117,19 +117,21 @@ void ImuDisplayandLoggingTask(void* pv)
            // printf("step 8 after the print of the imu\n");
         }
 
-        if(xQueueReceive(xADCQueue, &voltage, portMAX_DELAY) == pdTRUE)
+        if(xQueueReceive(xADCQueue, &voltage, 0) == pdTRUE)
         {
             //printf("in the xqueuereceive sprintf\n");
             snprintf(adc_buffer,sizeof(adc_buffer), "v: %.2f", voltage.meanReceived);
             //printf("after sprintf\n");
             Paint_DrawString_EN(90, 195, adc_buffer, &Font16, BLACK, GREEN);
             
-            vTaskDelay(pdMS_TO_TICKS(100));
+            //vTaskDelay(pdMS_TO_TICKS(100));
 
             printf("voltage %.2f\n", voltage.meanReceived);
             //printf("voltage %.2f, %.2f, %.2f\n", adc_buffer[0], adc_buffer[1], adc_buffer[2]);
         }
           LCD_1IN28_Display(screen_frame_buffer); // bug fix to get voltage to display too
+
+          vTaskDelay(pdMS_TO_TICKS(100));
     }
 }
 
@@ -158,13 +160,13 @@ void AdcParseTask(void* pv)
                 loc_buff = dma.dma_buffer_b;
 
                  
-                for(int i = 0; i <1024; i++)
+                for(int i = 0; i <ADC_BUFFER_SIZE; i++)
                 {
                     sumOfAll += loc_buff[i];
                 }
 
                 // printf("sumofall %f\n" , sumOfAll);
-                voltage.meanReceived = sumOfAll / 1024.0f;
+                voltage.meanReceived = sumOfAll / (float)ADC_BUFFER_SIZE;
                 xQueueSend(xADCQueue, (void*) &voltage, 0);
                   sumOfAll = 0;
                 
@@ -174,12 +176,12 @@ void AdcParseTask(void* pv)
                 loc_buff = dma.dma_buffer_a;
                 printf("which_buffer: %d\n", which_buffer);
                 printf("buffer a %f\n" , dma.dma_buffer_a);
-                for(int i = 0; i <1024; i++)
+                for(int i = 0; i < ADC_BUFFER_SIZE; i++)
                 {
                     sumOfAll += loc_buff[i];
                 }
                 
-                voltage.meanReceived  = sumOfAll / 1024.0f;
+                voltage.meanReceived  = sumOfAll / (float)ADC_BUFFER_SIZE;
                 xQueueSend(xADCQueue, (void*) &voltage, 0);
                 sumOfAll = 0;
               
@@ -217,7 +219,7 @@ int main()
                 "imu task",
                 256,
                 NULL, 
-                2,
+                3,
                 NULL
     );
 
@@ -225,7 +227,7 @@ int main()
                 "adc parsing task",
                 724,
                 NULL, 
-                3,
+                1,// do not need to read the voltage that much... interrupt essentially just puts it ina. cmd queue
                 &adc_task_handle
     );
 
@@ -237,7 +239,7 @@ int main()
                 "logging task",
                 1024 * 3, // takes a lot of memory to display
                 NULL,
-                1,
+                2,
                 NULL
     );
 

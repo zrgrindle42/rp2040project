@@ -24,6 +24,8 @@
 #define I2C_SDA_PIN 6
 #define I2C_SCL_PIN 7
 
+#define ADC_BUFFER_SIZE 1024
+
 // #define LCD_DC_PIN 8
 // #define LCD_CS_PIN 9
 // #define LCD_CLK_PIN 10
@@ -37,8 +39,8 @@ extern TaskHandle_t adc_task_handle;
 
 typedef struct
 {
-    uint16_t dma_buffer_a[1024];
-    uint16_t dma_buffer_b[1024];
+    uint16_t dma_buffer_a[ADC_BUFFER_SIZE];
+    uint16_t dma_buffer_b[ADC_BUFFER_SIZE];
 }DMA;
 
 extern DMA dma;

@@ -15,7 +15,8 @@ uint8_t rx_buffer[16];
 uint8_t config_buffer[2] = {0x02, 0x40};
 uint8_t accel_settings[2] = {0x03, 0x22};
 uint8_t gyro_settings[2] = {0x04, 0x54};
-uint8_t lpf[2] = {0x06, 0x11};
+uint8_t lpf[2] = {0x06, 0x11}; // was 0x11
+uint8_t fifo[2] = {0x14, 0x00};
 uint8_t start_buffer[2] = {0x08, 0x83};
 
 //write to ctrl8 register if you ant to do any motion sensor stuff
@@ -33,6 +34,7 @@ i2c_write_blocking(i2c1, PERIPHERAL_ADDRESS, accel_settings, 2, false);
 i2c_write_blocking(i2c1, PERIPHERAL_ADDRESS, gyro_settings, 2, false);
 i2c_write_blocking(i2c1, PERIPHERAL_ADDRESS, lpf, 2, false);
 i2c_write_blocking(i2c1, PERIPHERAL_ADDRESS, start_buffer, 2, false);
+i2c_write_blocking(i2c1, PERIPHERAL_ADDRESS, fifo, 2, false);
 sleep_ms(500);
 
 //configure master, already done in i2c init//
