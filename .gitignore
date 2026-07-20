@@ -1,0 +1,13 @@
+b/
+build/
+*.o
+*.o.d
+*.elf
+*.bin
+*.hex
+*.uf2
+*.dis
+*.map
+CMakeFiles/
+CMakeCache.txt
+Makefile
