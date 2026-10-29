@@ -2,7 +2,8 @@
 
 FreeRTOS firmware for a smartwatch built on the Waveshare RP2040-LCD-1.28, a small RP2040 board with an onboard round display and IMU. It shows live IMU and ADC readings on the round LCD.
 
-![Watch running on the bench](IMG_1847.jpeg)
+running product https://drive.google.com/file/d/1Z2q3aRLOh3xfTAMVfIFaQKTdapT_zn2o/edit the log
+                  https://drive.google.com/file/d/120xHSA0CCEXuBB70KdK_qf8ZDDMpgOzX/edit   the watch
 
 ## Hardware
 
